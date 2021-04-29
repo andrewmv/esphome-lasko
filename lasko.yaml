@@ -43,15 +43,6 @@ fan:
     name: Bedroom Tower Fan 
     output: fan_power
 
-# output:
-#   - platform: template
-#     type: binary
-#     id: fan_power
-#     write_action:
-#       - remote_transmitter.transmit_rc_switch_raw:
-#           protocol: 4
-#           code: '11011000000'
-
 output:
   - platform: template
     type: binary
