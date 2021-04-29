@@ -1,0 +1,64 @@
+esphome:
+  name: lasko
+  platform: ESP8266
+  board: nodemcuv2
+
+wifi:
+  ssid: "bleatband24"
+  password: "headbutt"
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Lasko Fallback Hotspot"
+    password: "WpkmwhJQm3hn"
+
+captive_portal:
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+  password: "granola-campsite-dilation"
+
+ota:
+  password: "granola-campsite-dilation"
+
+# Implementation
+
+remote_receiver:
+  pin: 
+    number: D7
+    inverted: true
+  dump: all
+
+remote_transmitter:
+  pin: 
+    number: D6
+    inverted: false
+  carrier_duty_percent: 50%
+
+fan:
+    platform: binary
+    name: Bedroom Tower Fan 
+    output: fan_power
+
+# output:
+#   - platform: template
+#     type: binary
+#     id: fan_power
+#     write_action:
+#       - remote_transmitter.transmit_rc_switch_raw:
+#           protocol: 4
+#           code: '11011000000'
+
+output:
+  - platform: template
+    type: binary
+    id: fan_power
+    write_action:
+      - remote_transmitter.transmit_raw:
+          carrier_frequency: 38kHz
+          code: [1294, -396, 1278, -391, 466, -1191, 1275, -395, 1303, -366, 493, -1163, 468, -1188, 467, -1189, 466, -1191, 465, -1190, 466, -1190, 1276, -7098, 1294, -393, 1277, -397, 462, -1190, 1277, -393, 1276, -376, 482, -1191, 465, -1191, 467, -1189, 
+                 466, -1191, 470, -1185, 466, -1192, 1276, -7111, 1303, -367, 1277, -393, 467, -1189, 1277, -397, 1274, -391, 466, -1190, 469, -1187, 468, -1189, 467, -1189, 466, -1190, 466, -1191, 1275, -7115, 1276, -394, 1276, -393, 467, -1189, 1275, -395, 1276, 
+                -394, 467, -1188, 469, -1187, 466, -1189, 468, -1189, 466, -1189, 467, -1193, 1273]
