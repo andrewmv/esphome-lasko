@@ -118,7 +118,17 @@ output:
       - if:
           condition:
             # If speed state has changed by two...
-            lambda: return ((id(bedroom_tower_fan).speed - id(actual_speed) == 0.33) || (id(bedroom_tower_fan).speed - id(actual_speed) == -0.66) );
+            # lambda: return ((id(bedroom_tower_fan).speed - id(actual_speed) == 0.33) || (id(bedroom_tower_fan).speed - id(actual_speed) < -0.6) );
+            lambda: |-
+              if ( (id(actual_speed) == FAN_SPEED_LOW) && (id(bedroom_tower_fan).speed == FAN_SPEED_MEDIUM) ) {
+                return true;
+              } else if ( (id(actual_speed) == FAN_SPEED_MEDIUM) && (id(bedroom_tower_fan).speed == FAN_SPEED_HIGH) ) {
+                return true;
+              } else if ( (id(actual_speed) == FAN_SPEED_HIGH) && (id(bedroom_tower_fan).speed == FAN_SPEED_LOW) ) {
+                return true;
+              } else {
+                return false;
+              }
           then:
             # ...Send another fan speed change
             - delay: 2s
