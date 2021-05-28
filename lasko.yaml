@@ -40,6 +40,15 @@ globals:
     restore_value: true
     initial_value: 'false'
 
+sensor:
+  - platform: dht
+    pin: D5
+    temperature:
+      name: "Bedroom Temperature"
+    humidity:
+      name: "Bedroom Humidity"
+    update_interval: 60s
+
 remote_receiver:
   pin: 
     number: D7
@@ -106,6 +115,9 @@ output:
             - remote_transmitter.transmit_raw:
                 carrier_frequency: 38kHz
                 code: [1294, -396, 1278, -391, 466, -1191, 1275, -395, 1303, -366, 493, -1163, 468, -1188, 467, -1189, 466, -1191, 465, -1190, 466, -1190, 1276, -7098, 1294, -393, 1277, -397, 462, -1190, 1277, -393, 1276, -376, 482, -1191, 465, -1191, 467, -1189, 466, -1191, 470, -1185, 466, -1192, 1276, -7111, 1303, -367, 1277, -393, 467, -1189, 1277, -397, 1274, -391, 466, -1190, 469, -1187, 468, -1189, 467, -1189, 466, -1190, 466, -1191, 1275, -7115, 1276, -394, 1276, -393, 467, -1189, 1275, -395, 1276, -394, 467, -1188, 469, -1187, 466, -1189, 468, -1189, 466, -1189, 467, -1193, 1273]
+
+            # If there's also a speed change, don't send it too quickly
+            - delay: 2s
       - if:
           condition:
             # If speed state has changed by at least one...
