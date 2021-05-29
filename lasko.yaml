@@ -32,9 +32,9 @@ globals:
     restore_value: true
     initial_value: 'false'
   - id: actual_speed
-    type: float
+    type: int
     restore_value: true
-    initial_value: '0.33'
+    initial_value: '1'
   - id: actual_oscillation
     type: bool
     restore_value: true
@@ -67,12 +67,12 @@ binary_sensor:
         fan.turn_on:
           id: bedroom_tower_fan
           speed: !lambda |-
-            if (id(bedroom_tower_fan).speed == FAN_SPEED_LOW) {
-              return FAN_SPEED_HIGH;
-            } else if (id(bedroom_tower_fan).speed == FAN_SPEED_MEDIUM) {
-              return FAN_SPEED_LOW;
+            if (id(bedroom_tower_fan).speed == 1) {
+              return 3;
+            } else if (id(bedroom_tower_fan).speed == 2) {
+              return 1;
             } else {
-              return FAN_SPEED_MEDIUM;
+              return 2;
             }
   - platform: remote_receiver
     id: power_button
@@ -132,11 +132,11 @@ output:
             # If speed state has changed by two...
             # lambda: return ((id(bedroom_tower_fan).speed - id(actual_speed) == 0.33) || (id(bedroom_tower_fan).speed - id(actual_speed) < -0.6) );
             lambda: |-
-              if ( (id(actual_speed) == FAN_SPEED_LOW) && (id(bedroom_tower_fan).speed == FAN_SPEED_MEDIUM) ) {
+              if ( (id(actual_speed) == 1) && (id(bedroom_tower_fan).speed == 2) ) {
                 return true;
-              } else if ( (id(actual_speed) == FAN_SPEED_MEDIUM) && (id(bedroom_tower_fan).speed == FAN_SPEED_HIGH) ) {
+              } else if ( (id(actual_speed) == 2) && (id(bedroom_tower_fan).speed == 3) ) {
                 return true;
-              } else if ( (id(actual_speed) == FAN_SPEED_HIGH) && (id(bedroom_tower_fan).speed == FAN_SPEED_LOW) ) {
+              } else if ( (id(actual_speed) == 3) && (id(bedroom_tower_fan).speed == 1) ) {
                 return true;
               } else {
                 return false;
@@ -168,5 +168,6 @@ fan:
   - platform: speed
     id: bedroom_tower_fan
     name: Bedroom Tower Fan 
+    speed_count: 3
     output: fan_output
     oscillation_output: fan_osc
