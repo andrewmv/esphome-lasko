@@ -4,13 +4,13 @@ esphome:
   board: nodemcuv2
 
 wifi:
-  ssid: 
-  password: 
+  ssid: !secret ssid
+  password: !secret wappw
 
   # Enable fallback hotspot (captive portal) in case wifi connection fails
   ap:
     ssid: "Lasko Fallback Hotspot"
-    password: 
+    password: !secret hotspotpw
 
 captive_portal:
 
@@ -19,10 +19,10 @@ logger:
 
 # Enable Home Assistant API
 api:
-  password: 
+  password: !secret apipw
 
 ota:
-  password: 
+  password: !secret apipw
 
 # Implementation
 
@@ -42,6 +42,7 @@ globals:
 
 sensor:
   - platform: dht
+    model: DHT22
     pin: D5
     temperature:
       name: "Bedroom Temperature"
@@ -147,6 +148,25 @@ output:
             - remote_transmitter.transmit_raw:
                 carrier_frequency: 38kHz
                 code: [1297, -374, 1271, -399, 485, -1171, 1270, -400, 1270, -399, 459, -1197, 459, -1197, 459, -1197, 458, -1198, 459, -1198, 1268, -401, 458, -7918, 1244, -426, 1243, -426, 433, -1224, 1268, -402, 1268, -401, 460, -1196, 458, -1198, 458, -1198, 459, -1197, 459, -1198, 1269, -399, 459, -7918, 1269, -400, 1270, -399, 461, -1196, 1270, -399, 1271, -398, 459, -1198, 459, -1196, 460, -1197, 460, -1196, 459, -1197, 1271, -398, 461, -7915, 1271, -402, 1267, -399, 460, -1196, 1272, -398, 1271, -399, 461, -1195, 485, -1171, 460, -1196, 461, -1195, 462, -1195, 1273, -396, 461, -7914, 1298, -373, 1270, -398, 487, -1170, 1271, -398, 1271, -398, 462, -1195, 485, -1171, 486, -1170, 462, -1194, 485, -1172, 1296, -373, 486, -7891, 1297, -373, 1297, -372, 488, -1169, 1272, -398, 1272, -398, 486, -1170, 461, -1195, 462, -1194, 487, -1170, 461, -1195, 1271, -397, 462, -7914, 1271, -399, 1271, -398, 461, -1195, 1271, -399, 1271, -398, 461, -1195, 460, -1196, 460, -1196, 462, -1195, 461, -1195, 1271, -398, 461]
+      - if:
+          condition:
+            # The fan doesn't remember oscillation state when powered on,
+            # but we would like it to, so send an osc toggle command if needed
+            lambda: |-
+              // If we just transitioned from off to on...
+              if ( (id(actual_power) == false) && (id(bedroom_tower_fan).state == true) ) {
+                // ...and if we also expect osc to be enabled
+                if ( id(bedroom_tower_fan).oscillating == true ) {
+                  return true;
+                }
+              }
+              return false;
+          then:
+            # ...Send an oscillation toggle
+            - delay: 2s
+            - remote_transmitter.transmit_raw:
+                carrier_frequency: 38kHz
+                code: [1184, -512, 1156, -513, 373, -1282, 1158, -512, 1157, -512, 348, -1333, 322, -1284, 1183, -510, 375, -1281, 351, -1280, 374, -1279, 402, -7999, 1185, -538, 1106, -539, 316, -1311, 1182, -513, 1131, -537, 323, -1304, 377, -1282, 1183, -460, 398, -1257, 374, -1332, 348, -1281, 347, -8025, 1159, -536, 1132, -535, 325, -1306, 1158, -539, 1158, -485, 374, -1282, 347, -1306, 1160, -538, 321, -1308, 347, -1333, 349, -1306, 324, -8051, 1156, -484, 1185, -483, 352, -1307, 1183, -537, 1098, -518, 349, -1306, 373, -1311, 1130, -536, 322, -1413, 243, -1360, 296, -1359, 301, -8045, 1159, -590, 1054, -536, 347, -1310, 1130, -538, 1132, -537, 324, -1334, 321, -1331, 1134, -509, 351, -1332, 348, -1311, 321, -1331, 321]
       - lambda: id(actual_power) = id(bedroom_tower_fan).state;
       - lambda: id(actual_speed) = id(bedroom_tower_fan).speed;
   - platform: template
